@@ -1,0 +1,10 @@
+{
+	"appName": {
+		"message": "FoE - Wiki Helper",
+		"description": "The title of the application, displayed in the web store."
+	},
+	"appDesc": {
+		"message": "Tools and scripts to make editing the fandom wiki easier",
+		"description":"The description of the application, displayed in the web store."
+	}
+}
