@@ -1,5 +1,5 @@
-CummulativeTechs = {
-	WikiTranslate: {
+CumulativeTech = {
+	WikiTranslate: {...{
 		residential:"{{ReBu}}",
 		decoration:	"{{Deco}}",
 		culture:	"{{CuBu}}",
@@ -51,53 +51,55 @@ CummulativeTechs = {
 		SpaceAgeVenus:	"Space Age Venus",
 		SpaceAgeJupiterMoon:	"Space Age Jupiter Moon",
 		SpaceAgeTitan:	"Space Age Titan",
-	},
+	},...JSON.parse(localStorage.getItem("WikiCumTechSettings")||"{}")},
 	Output:{},
 	
 	createOutput:() => {
 		if (!Technologies.AllTechnologies) return;
 		if (!MainParser.CityEntities) return;
 		if (!GoodsData) return;
+		CumulativeTech.Output = {}
+
 		let numberWithCommas = (x) => {
 			if (!x) return ""
 			return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 		};
 		let trans = (x) => {
-			if (CummulativeTechs.WikiTranslate[x]) return CummulativeTechs.WikiTranslate[x];
+			if (CumulativeTech.WikiTranslate[x]) return CumulativeTech.WikiTranslate[x];
 			return x;
 		}
 		let techs = {};
-		let eras = {}
+		let eras = {};
 		for (let tech of Technologies.AllTechnologies) {
 			techs[tech.id] = tech.name;
 			eras[tech.id] = tech.era;
 		}
 		for (let tech of Technologies.AllTechnologies) {
-			if (!CummulativeTechs.Output[tech.era]) CummulativeTechs.Output[tech.era] = [`<div class="flex-container">`] 
+			if (!CumulativeTech.Output[tech.era]) CumulativeTech.Output[tech.era] = [`This is a list of all [[Technology|technologies]] of the [[${trans(tech.era)}]].<div class="flex-container">`] 
 			let wiki = "{{TechBoxNew|" + tech.name + "|" + tech.id;
 			if (tech.maxSP) wiki += "|FP=" + numberWithCommas(tech.maxSP);
 			if (tech.requirements.resources.money) wiki += "|Coins=" + numberWithCommas(tech.requirements.money);
 			if (tech.requirements.resources.supplies) wiki += "|Supplies=" + numberWithCommas(tech.requirements.supplies);
 			wiki += "|Age=" + trans(tech.era);
-			wiki += "\n|Goods="
+			wiki += "\n|Goods=";
 			for (let g in tech.requirements.resources) {
 				if (!tech.requirements.resources[g]) continue;
 				if (g == "supplies" || g=="money") continue;
-				wiki += `{{${GoodsData[g].name}}} ` + numberWithCommas(tech.requirements.resources[g]) + " "
+				wiki += `{{${GoodsData[g].name}}} ` + numberWithCommas(tech.requirements.resources[g]) + " ";
 			}
-			wiki += "\n|Requires="
-			let req=[]
+			wiki += "\n|Requires=";
+			let req=[];
 			for (let t of tech.parentTechnologies) {
 				req.push (`{{ITEC}} [[${tech.era != eras[t] ? trans(eras[t]) + " Technologies":""}#${techs[t]}|${techs[t]}]]`)
 			}
-			wiki += req.join("<br>")
-			wiki += "\n|LeadsTo="
+			wiki += req.join("<br>");
+			wiki += "\n|LeadsTo=";
 			let lead=[]
 			for (let t of tech.childTechnologies) {
 				lead.push (`{{ITEC}} [[${tech.era != eras[t] ? trans(eras[t]) + " Technologies":""}#${techs[t]}|${techs[t]}]]`)
 			}
-			wiki += lead.join("<br>")
-			wiki += "\n|Unlocks="
+			wiki += lead.join("<br>");
+			wiki += "\n|Unlocks=";
 			let unl=[]
 			if (tech.rewards) {
 				for (let r of tech.rewards) {
@@ -138,18 +140,20 @@ CummulativeTechs = {
 
 					}
 				}
-			wiki += unl.join(" <br> ")	
+			wiki += unl.join(" <br> ");
 			}
-			wiki += "}}"
-			CummulativeTechs.Output[tech.era].push(wiki).push(`</div`)
-		}	
+			wiki += "}}";
+			CumulativeTech.Output[tech.era].push(wiki);
+		}
+		for (let era in CumulativeTech.Output) {
+			if (CumulativeTech.Output[era]) CumulativeTech.Output[era].push(`</div>`)
+		}
 	},
+
 	CSS:"",
 	CSSCreate: (XML) => {
-		if (!XML.responseURL.includes("technology_icons_0")) return
+		if (!XML?.responseURL?.includes("technology_icons_0")) return
 		let x=JSON.parse(XML.response);
-		console.log(x);
-		
 		let out=[];
 		out.push(`.tech_img {\n\theight:90px;\n\twidth:90px;\n\tmargin:auto;\n\ttext-align:left;\n\t& img {\n\t\tposition:absolute;\n\t}\n\t& p {\n\t\tmargin:0;\n\t}\n}\n\n`);
 		for (let img of x.frames) {
@@ -158,10 +162,65 @@ CummulativeTechs = {
 			out.push(`\ttransform: translate(-${img[1]}px, -${img[2]}px);`)
 			out.push(`}\n`)
 		}
-		console.log("CSS:\n",out.join(`\n`))
-		FoEproxy.removeRawHandler(CummulativeTechs.CSS)
+		CumulativeTech.CSS=out.join(`\n`)
+		FoEproxy.removeRawHandler(CumulativeTech.CSSCreate);
+		setTimeout(WikiBox.update,1000) 
+	},
+
+	display: ()=>{
+		
+		CumulativeTech.createOutput()
+		let out='';
+		if (CumulativeTech.CSS=="") {
+			out+= '<h1 style="color:var(--text-bright)">Open Research first!</h1>'
+		} else {
+			out +='<h2>Output the Cumulative Tech page for the respective Era</h2><div class="btn-group" style="flex-wrap:wrap">'
+			for (era in CumulativeTech.Output) {
+				if (!CumulativeTech.Output[era]) continue;
+				out += `<div class="btn-default" data-era="${era}" style="flex-grow:1" onclick="CumulativeTech.CopyEra(event)">${CumulativeTech.WikiTranslate[era]}</div>`
+			}			
+			out+='</div><h2>Output the CSS for the Tech Images</h2>';
+			out+='<div class="btn-group" style="flex-wrap:wrap"><div class="btn-default" onclick="CumulativeTech.CopyCSS()">Copy CSS for Tech Icons</div>';
+			let link = srcLinks.get("/research/technology_icons/technology_icons_0.jpg",true)
+			out+=`<a href="${link}" class="btn-default" target="_blank">Current Tech Image</a></div>`;	
+		}
+		out+='<h2>Settings for Export</h2>';
+		out+=`<textarea width="100%" id="CumulativeTechSettings" onfocusout="CumulativeTech.SaveSettings()">${JSON.stringify(CumulativeTech.WikiTranslate).replace(/,/g,",\n").replace("{","{\n").replace('"}','"\n}')}</textarea>`;
+			
+		return out;
+	},
+	CopyEra: (evt)=>{
+		let era = evt.target.dataset.era
+		let out=CumulativeTech.Output[era].join("\n\n")
+		helper.str.copyToClipboard(out)
+		let url=`https://forgeofempires.fandom.com/wiki/${CumulativeTech.WikiTranslate[era] + " Technologies"}?veaction=editsource`;
+   		if ($('#OpenWiki')[0].checked) window.open(url,'_blank');
+    	//$('#WikiLink')[0].href = url;
+	},
+	CopyCSS: ()=>{
+		helper.str.copyToClipboard(CumulativeTech.CSS)
+		let url=`https://forgeofempires.fandom.com/wiki/MediaWiki:TechnologyImages.css?veaction=editsource`;
+   		if ($('#OpenWiki')[0].checked) window.open(url,'_blank');
+    	//$('#WikiLink')[0].href = url;
+	},
+	SaveSettings:()=>{
+		try {
+			let j = JSON.parse($('#CumulativeTechSettings').val());
+			CumulativeTech.WikiTranslate = j;
+			localStorage.setItem("WikiCumTechSettings",JSON.stringify(j));
+		} catch {
+			alert("Settings have a JSON error - please check Input! Settings not saved!")
+		}
+
+	
 	}
+	
 }
 
-FoEproxy.addRawHandler(CummulativeTechs.CSSCreate)
-
+FoEproxy.addRawHandler(CumulativeTech.CSSCreate)
+FoEproxy.addMetaHandler("research_eras",(response)=>{
+	let eras = JSON.parse(response.responseText)
+	for (let x of eras) {
+		if (!CumulativeTech.WikiTranslate[x.era]) CumulativeTech.WikiTranslate[x.era] = x.name;
+	}
+})

@@ -32,6 +32,7 @@
 				"js/*",
 				"vendor/*",
 				"css/*",
+				"images/*",
 				"content/*"
 			],
 			"matches": [ "https://*/*" ]

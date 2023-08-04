@@ -72,6 +72,7 @@ function inject (extUrl = chrome.runtime.getURL('')) {
 		if(document.head !== null){
 			
 			let cssFiles = [
+				'WikiMain'
 			];
 
 			// insert stylesheet
@@ -92,7 +93,7 @@ function inject (extUrl = chrome.runtime.getURL('')) {
 
 	async function InjectCode(extUrl) {
 				
-		await promisedLoadCode(`${extUrl}js/web/proxydetect/js/proxydetect.js?v=${v}`, "proxy");
+		await promisedLoadCode(`${extUrl}js/web/wikiMain/js/wikiMain.js?v=${v}`, "proxy");
 		await proxyloaded;
 		// start loading both script-lists
 		const vendorListPromise = loadJsonResource(`${extUrl}js/vendor.json`);
