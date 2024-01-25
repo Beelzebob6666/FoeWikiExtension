@@ -224,3 +224,5 @@ FoEproxy.addMetaHandler("research_eras",(response)=>{
 		if (!CumulativeTech.WikiTranslate[x.era]) CumulativeTech.WikiTranslate[x.era] = x.name;
 	}
 })
+
+WikiBox.tabs["CumulativeTech"]={title: "Cumulative Tech", html: () => {return CumulativeTech.display()}}

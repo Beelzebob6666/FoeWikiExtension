@@ -1,15 +1,14 @@
 
-
+const WikiMayRun = new Promise(resolve => {
+	window.addEventListener('foe-helper#loaded', evt => {
+		resolve();
+	}, {capture: false, once: true, passive: true});
+});
 
 wiki_proxy_detect ()
 
 async function wiki_proxy_detect () {
 	
-	const proxyloaded = new Promise(resolve => {
-		window.addEventListener('foe-helper#loaded', evt => {
-			resolve();
-		}, {capture: false, once: true, passive: true});
-	});
 	
 	while (typeof FoEproxy == "undefined") await new Promise((resolve) => {
 		// @ts-ignore
@@ -18,7 +17,7 @@ async function wiki_proxy_detect () {
 
 	window.dispatchEvent(new CustomEvent('foe-wiki#proxyloaded'));
 	
-	await proxyloaded;	
+	await WikiMayRun;	
 	
 	div = document.createElement("div");
 	div.id = "WikiOpenButton";
@@ -28,9 +27,7 @@ async function wiki_proxy_detect () {
 }
 
 WikiBox = {
-	tabs: {
-		"CumulativeTech":{title: "Cumulative Tech", callback: () => {return CumulativeTech.display()}}
-	},
+	tabs: {},
 	selected: "CumulativeTech",
 
 	show: () => {
@@ -59,7 +56,7 @@ WikiBox = {
             HTML.CloseOpenBox('WikiBox');
         }
 	},
-	update: (evt) => {
+	update: async (evt) => {
 		let tab="";
 		if (evt) {
 			WikiBox.selected = evt.target.dataset.tab;
@@ -68,7 +65,8 @@ WikiBox = {
 		}
 		tab = WikiBox.selected;
 		
-		$('#WikiOutput').html(WikiBox.tabs[tab].callback());
+		$('#WikiOutput').html(await WikiBox.tabs[tab].html());
+		if (WikiBox.tabs[tab].callback) WikiBox.tabs[tab].callback()
 	},
 	test:()=>{
 		return "test"

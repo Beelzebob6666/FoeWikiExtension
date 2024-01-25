@@ -1,2 +1,5 @@
 [
+    "zip/jszip",
+    "zip/jszip-utils",
+    "zip/FileSaver"
 ]

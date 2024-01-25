@@ -27,3 +27,25 @@
     height: 400px;
     resize: none;
 }
+
+#HXTable {
+    width: 100%;
+    & thead tr:first-child th {
+        position: sticky;
+        top: 0px;
+        &:first-child {
+            width:130px;
+        }
+        &:nth-child(3) {
+            width:80px;
+        }
+    }
+    & tr.selected {
+        background: rgba(0,0,0,.4);
+    }
+    & td:nth-child(2) {
+        line-break: anywhere;
+        display: block;
+    }
+    
+}
