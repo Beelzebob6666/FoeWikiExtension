@@ -30,7 +30,7 @@
 
 #HXTable {
     width: 100%;
-    & thead tr:first-child th {
+    & th {
         position: sticky;
         top: 0px;
         &:first-child {

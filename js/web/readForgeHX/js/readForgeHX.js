@@ -188,20 +188,16 @@ let readForgeHX = {
         let out = '<div id="imageList" style="display:none""></div>';
 
         out += '<table id="HXTable" class="foe-table" ><thead><tr>'
-            out += '<th>updated</th>'
-            out += '<th>path</th>'
-            out += '<th>added</th>'
-        out += '</tr><tr>'
-            out += `<th><input type="date" id="HXstartUpdate" value="${dates[0]}"></input><br/> 
+        out += `<th><span id=HXUpdatedRemoved>updated</span><br/>
+                    <input type="date" id="HXstartUpdate" value="${dates[0]}"></input><br/> 
                     - <input type="date" id="HXendUpdate" value="${dates[0]}"></input></th>`
-            out += '<th><input id= HXfilter type="text" size="20">'
-            out += '<button class="btn-default" onclick="readForgeHX.copyLinks()">Copy Links</button>'
-            out += '<button class="btn-default" onclick="readForgeHX.copyLinks(true)">Copy Links for Forum</button>'
-            out += '<button class="btn-default" onclick="readForgeHX.download()">Download Images</button></th>'
-            out += '<th></th>'
-        out += `</tr>`
-        out += `</thead><tbody></tbody>`
-        out += "</table>"
+        out += `<th>path<br/>
+                    <input id= HXfilter type="text" size="20">
+                    <button class="btn-default" onclick="readForgeHX.copyLinks()">Copy Links</button>
+                    <button class="btn-default" onclick="readForgeHX.copyLinks(true)">Copy Links for Forum</button>
+                    <button class="btn-default" onclick="readForgeHX.download()">Download Images</button></th>`
+        out += '<th>added</th>'
+        out += `</tr></thead><tbody></tbody></table>`;
         return out
 
     },
@@ -216,6 +212,14 @@ let readForgeHX = {
             if (e.key!="Enter") return
             readForgeHX.updateFiles()
         });
+        $('#HXUpdatedRemoved').on("click",(e)=>{
+            if (e.target.innerHTML == "updated") {
+                e.target.innerHTML = "removed" 
+            } else {
+                e.target.innerHTML = "updated"
+            }
+            readForgeHX.updateFiles()
+        });
         let Image = document.createElement("div");
         Image.id= "HXPreviewImage"
         Image.style = "z-index:1000; background:white; position: absolute; display: none; max-width: 300px; max-height: 300px; pointer-events: none;"
@@ -227,11 +231,18 @@ let readForgeHX = {
         let filter = new RegExp($('#HXfilter')[0].value);
         let startDate = $('#HXstartUpdate')[0].value;
         let endDate = $('#HXendUpdate')[0].value;
-        let files = await readForgeHX.DB.files.where("updated").between(startDate,endDate,true,true).filter(file => filter.test(file.id)).toArray();
+        let ur = $('#HXUpdatedRemoved')[0].innerHTML;
+        let files = await readForgeHX.DB.files.where(ur).between(startDate,endDate,true,true).filter(file => filter.test(file.id)).toArray();
         let table = files.map(file => {
+            if (ur=="updated" && file.removed != "") return "";
+            if (ur!="updated" && file.removed == "") return "";
             line=`<tr class="clickToSelect" id="${file.id}">`;
-            line+=`<td>${file.updated}</td>`;
-            line+=`<td class="showImage"><a href="${srcLinks.get(file.id,true)}" target="_blank">${file.id}</a></td>`;
+            line+=`<td>${ur=="updated" ? file.updated : file.removed}</td>`;
+            if (ur=="updated") {
+                line+=`<td class="showImage"><a href="${srcLinks.get(file.id,true)}" target="_blank">${file.id}</a></td>`;
+            } else {
+                line+=`<td>${file.id}</td>`;
+            }
             line+=`<td>${file.added}</td>`;
             line+=`</tr>`;
             return line;
@@ -240,7 +251,11 @@ let readForgeHX = {
         $('.showImage').on("pointerenter",(e)=>{
             let h=e.target.firstChild.href;
             if (!h) h= e.target.href;
-            readForgeHX.imageContainer.innerHTML=`<img src="${h}" style="max-width: 300px;max-height: 300px;">`            
+            let split= h.split(".");
+            let type= split[split.length-1]
+            let img="";
+            if (["jpg","png"].includes(type)) img= `<img src="${h}" style="max-width: 300px;max-height: 300px;">`
+            readForgeHX.imageContainer.innerHTML=img;
             if (!readForgeHX.imageActive) {
                 readForgeHX.imageActive = true;
                 readForgeHX.imageContainer.style.display = "block";
@@ -278,17 +293,13 @@ let readForgeHX = {
         let out = '<div id="imageList" style="display:none""></div>';
 
         out += '<table id="HXTable" class="foe-table" ><thead><tr>'
-            out += '<th>added</th>'
-            out += '<th>string</th>'
-        out += '</tr><tr>'
-            out += `<th><input type="date" id="HXstartUpdate" value="${dates[0]}"></input><br/> 
-                    - <input type="date" id="HXendUpdate" value="${dates[0]}"></input></th>`
-            out += '<th><input id= HXfilter type="text" size="20">'
-            out += '<button class="btn-default" onclick="readForgeHX.copy()">Copy</button>'
-            out += '</th>'
-        out += `</tr>`
-        out += `</thead><tbody></tbody>`
-        out += "</table>"
+            out += `<th><span id="HXAddedRemoved">added</span><br/>
+                        <input type="date" id="HXstartUpdate" value="${dates[0]}"></input><br/> 
+                        - <input type="date" id="HXendUpdate" value="${dates[0]}"></input></th>`
+            out += `<th>string <br/>
+                        <input id= HXfilter type="text" size="20">
+                        <button class="btn-default" onclick="readForgeHX.copy()">Copy</button></th>`
+        out += `</tr></thead><tbody></tbody></table>`
         return out
 
     },
@@ -303,16 +314,27 @@ let readForgeHX = {
             if (e.key!="Enter") return
             readForgeHX.updateStrings()
         });
+        $('#HXAddedRemoved').on("click",(e)=>{
+            if (e.target.innerHTML == "added") {
+                e.target.innerHTML = "removed" 
+            } else {
+                e.target.innerHTML = "added"
+            }
+            readForgeHX.updateStrings()
+        });
+        
         readForgeHX.updateStrings();
     },
     updateStrings: async () =>{
         let filter = new RegExp($('#HXfilter')[0].value);
         let startDate = $('#HXstartUpdate')[0].value;
         let endDate = $('#HXendUpdate')[0].value;
-
-        let strings = await readForgeHX.DB.strings.where("added").between(startDate,endDate,true,true).filter(string => filter.test(string.id)).toArray();
+        let ar = $('#HXAddedRemoved')[0].innerHTML;
+        let strings = await readForgeHX.DB.strings.where(ar).between(startDate,endDate,true,true).filter(string => filter.test(string.id)).toArray();
 
         let table = strings.map(string => {
+            if (ar=="added" && string.removed != "") return "";
+            if (ar!="added" && string.removed == "") return "";
             line=`<tr class="clickToSelect">`;
             line+=`<td>${string.added}</td>`;
             line+=`<td id="${string.id}">${string.id}</td>`;
