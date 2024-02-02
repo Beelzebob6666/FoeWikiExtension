@@ -3,8 +3,8 @@ let readForgeHX = {
     gameVersion: localStorage.getItem("gameVersion")|| "",
     versionDate:"",
     DB: null,
-    imageActive:false,
-    imageContainer:null,
+    containerActive:false,
+    Container:null,
     mousedrag:false,
     selected:false,
 
@@ -16,6 +16,9 @@ let readForgeHX = {
                 files: 'id,hash,added,updated,removed',
                 strings: 'id,added,removed',
             });
+            db.version(2).stores({
+                buildings: 'id,JSON,added,updated,removed,oldJSON',
+            });
             
             await db.open()
         }
@@ -23,6 +26,7 @@ let readForgeHX = {
     init: async () => {
         WikiBox.tabs["readForgeHXFiles"]={title: "Forge HX - Files", html: () => {return readForgeHX.displayFiles()}, callback: () => {readForgeHX.activateFiles()}},
 		WikiBox.tabs["readForgeHXStrings"]={title: "Forge HX - Strings", html: () => {return readForgeHX.displayStrings()}, callback: () => {readForgeHX.activateStrings()}},
+		WikiBox.tabs["readBuildings"]={title: "Buildings List", html: () => {return readForgeHX.displayBuildings()}, callback: () => {readForgeHX.activateBuildings()}},
 	
         // wait for DB loaded
 
@@ -42,6 +46,7 @@ let readForgeHX = {
         readForgeHX.getDateFromVersion();
         await readForgeHX.files();
         await readForgeHX.strings();
+        await readForgeHX.buildings();
     },
     files: async () => {
         let HXscript = srcLinks.raw+"";
@@ -75,20 +80,20 @@ let readForgeHX = {
             toAdd.push({id:N,hash:New[N],added:readForgeHX.versionDate,updated:readForgeHX.versionDate,removed:""})
         }
 
-        let info = ""
+        let info = "";
         if (toAdd.length > 0) {
             await readForgeHX.DB.files.bulkPut(toAdd);
-            info += toAdd.length + " added\n"
+            info += toAdd.length + " added\n";
         }
         if (Object.keys(toUpdate).length > 0) {
             
             let updated = await readForgeHX.DB.files.bulkGet(Object.keys(toUpdate))
             for (let s of updated) {
-                s.updated = readForgeHX.versionDate
+                s.updated = readForgeHX.versionDate;
                 s.hash = toUpdate[s.id];
             }       
             await readForgeHX.DB.files.bulkPut(updated);
-            info += Object.keys(toUpdate).length + " updated\n"
+            info += Object.keys(toUpdate).length + " updated\n";
         }
         if (Object.keys(Old).length > 0) {
             let toRemove = await readForgeHX.DB.files.bulkGet(Object.keys(Old))
@@ -96,14 +101,14 @@ let readForgeHX = {
                 s.removed=readForgeHX.versionDate;
             }       
             await readForgeHX.DB.files.bulkPut(toRemove);
-            info += toRemove.length + " removed"
+            info += toRemove.length + " removed";
         }
         if (info !="") {
             HTML.ShowToastMsg({
                 head: 'Files',
                 text: info,
                 type: 'info',
-                hideAfter: 20000,
+                hideAfter: 30000,
             })
         }
     },
@@ -127,13 +132,13 @@ let readForgeHX = {
         } 
         let toAdd = [];
         for (let N of Object.keys(New)) {
-            toAdd.push({id:N,added:readForgeHX.versionDate,removed:""})
+            toAdd.push({id:N,added:readForgeHX.versionDate,removed:""});
         }
         
         let info="";
         if (toAdd.length > 0) {
             await readForgeHX.DB.strings.bulkPut(toAdd);
-            info += toAdd.length + " added\n"
+            info += toAdd.length + " added\n";
         }
         if (Object.keys(Old).length > 0) {
             let toRemove = await readForgeHX.DB.strings.bulkGet(Object.keys(Old))
@@ -141,14 +146,78 @@ let readForgeHX = {
                 s.removed=readForgeHX.versionDate;
             }       
             await readForgeHX.DB.strings.bulkPut(toRemove);
-            info += toRemove.length + " removed"
+            info += toRemove.length + " removed";
         }
         if (info !="") {
             HTML.ShowToastMsg({
                 head: 'Strings',
                 text: info,
                 type: 'info',
-                hideAfter: 20000,
+                hideAfter: 30000,
+            })
+        }
+    },
+
+    buildings: async () => {
+        
+        let OldB = await readForgeHX.DB.buildings.where("removed").equals("").toArray();
+        let Old={};
+        OldB.forEach(a => Old[a.id] = a.JSON);
+
+        let New = {};
+        for (let i in MainParser.CityEntities) {
+            New[i]=JSON.stringify(MainParser.CityEntities[i]);
+        }
+        
+        let toUpdate = {};
+
+        if (Object.keys(Old).length > 0) {
+            for (let N of Object.keys(New)) {
+                if (Old[N]) {
+                    if (Old[N] != New[N]) {
+                        toUpdate[N] = New[N];
+                    } 
+                    delete New[N];
+                    delete Old[N];
+                }
+            }
+        } 
+        let toAdd = [];
+        for (let N of Object.keys(New)) {
+            toAdd.push({id:N,JSON:New[N],oldJSON:"",added:readForgeHX.versionDate,updated:readForgeHX.versionDate,removed:""})
+        }
+
+        let info = "";
+        if (toAdd.length > 0) {
+            await readForgeHX.DB.buildings.bulkPut(toAdd);
+            info += toAdd.length + " added\n"
+        }
+        if (Object.keys(toUpdate).length > 0) {
+            
+            let updated = await readForgeHX.DB.buildings.bulkGet(Object.keys(toUpdate))
+            for (let s of updated) {
+                s.updated = readForgeHX.versionDate;
+                s.oldJSON = s.JSON;
+                s.JSON = toUpdate[s.id];
+
+            }       
+            await readForgeHX.DB.buildings.bulkPut(updated);
+            info += Object.keys(toUpdate).length + " updated\n";
+        }
+        if (Object.keys(Old).length > 0) {
+            let toRemove = await readForgeHX.DB.buildings.bulkGet(Object.keys(Old))
+            for (let s of toRemove) {
+                s.removed=readForgeHX.versionDate;
+            }       
+            await readForgeHX.DB.buildings.bulkPut(toRemove);
+            info += toRemove.length + " removed";
+        }
+        if (info !="") {
+            HTML.ShowToastMsg({
+                head: 'Buildings',
+                text: info,
+                type: 'info',
+                hideAfter: 30000,
             })
         }
     },
@@ -168,7 +237,7 @@ let readForgeHX = {
                 head: 'New Version',
                 text: readForgeHX.gameVersion,
                 type: 'info',
-                hideAfter: 20000,
+                hideAfter: 30000,
             })
             return true;
         } else {
@@ -220,11 +289,10 @@ let readForgeHX = {
             }
             readForgeHX.updateFiles()
         });
-        let Image = document.createElement("div");
-        Image.id= "HXPreviewImage"
-        Image.style = "z-index:1000; background:white; position: absolute; display: none; max-width: 300px; max-height: 300px; pointer-events: none;"
-        $('#game_body').append(Image);
-        readForgeHX.imageContainer = Image;
+        let container = document.createElement("div");
+        container.style = "z-index:1000; background:white; position: absolute; display: none; max-width: 300px; max-height: 300px; pointer-events: none;"
+        $('#game_body').append(container);
+        readForgeHX.Container = container;
         readForgeHX.updateFiles();
     },
     updateFiles: async () =>{
@@ -255,16 +323,16 @@ let readForgeHX = {
             let type= split[split.length-1]
             let img="";
             if (["jpg","png"].includes(type)) img= `<img src="${h}" style="max-width: 300px;max-height: 300px;">`
-            readForgeHX.imageContainer.innerHTML=img;
-            if (!readForgeHX.imageActive) {
-                readForgeHX.imageActive = true;
-                readForgeHX.imageContainer.style.display = "block";
+            readForgeHX.Container.innerHTML=img;
+            if (!readForgeHX.containerActive) {
+                readForgeHX.containerActive = true;
+                readForgeHX.Container.style.display = "block";
                 window.addEventListener("pointermove", readForgeHX.followMouse);
               }
         })
         $('.showImage').on("pointerleave",(e)=>{
-            readForgeHX.imageActive = false;
-            readForgeHX.imageContainer.style.display = "none";
+            readForgeHX.containerActive = false;
+            readForgeHX.Container.style.display = "none";
             window.removeEventListener("pointermove", readForgeHX.followMouse);
         })
 
@@ -290,7 +358,7 @@ let readForgeHX = {
     displayStrings: async () => {
         let dates = await readForgeHX.DB.strings.orderBy('added').reverse().uniqueKeys();
         
-        let out = '<div id="imageList" style="display:none""></div>';
+        let out = '<div id="stringList" style="display:none""></div>';
 
         out += '<table id="HXTable" class="foe-table" ><thead><tr>'
             out += `<th><span id="HXAddedRemoved">added</span><br/>
@@ -362,9 +430,93 @@ let readForgeHX = {
         });     
 
     },
+    displayBuildings: async () => {
+        let dates = await readForgeHX.DB.buildings.orderBy('updated').reverse().uniqueKeys();
+        
+        let out = '<div id="buildingList" style="display:none""></div>';
+
+        out += '<table id="HXTable" class="foe-table" ><thead><tr>'
+        out += `<th><span id=HXUpdatedRemoved>updated</span><br/>
+                    <input type="date" id="HXstartUpdate" value="${dates[0]}"></input><br/> 
+                    - <input type="date" id="HXendUpdate" value="${dates[0]}"></input></th>`
+        out += `<th>Name<br/>
+                    <input id= HXfilter type="text" size="20">`
+        out += '<th>added</th>'
+        out += `</tr></thead><tbody></tbody></table>`;
+        return out
+
+    },
+    activateBuildings: () => {
+        $('#HXstartUpdate').on("change",()=>{
+            readForgeHX.updateBuildings()
+        });
+        $('#HXendUpdate').on("change",()=>{
+            readForgeHX.updateBuildings()
+        });
+        $('#HXfilter').on("keyup",(e)=>{
+            if (e.key!="Enter") return
+            readForgeHX.updateBuildings()
+        });
+        $('#HXUpdatedRemoved').on("click",(e)=>{
+            if (e.target.innerHTML == "updated") {
+                e.target.innerHTML = "removed" 
+            } else {
+                e.target.innerHTML = "updated"
+            }
+            readForgeHX.updateBuildings()
+        });
+        readForgeHX.updateBuildings();
+    },
+
+    updateBuildings: async () =>{
+        let filter = new RegExp($('#HXfilter')[0].value);
+        let startDate = $('#HXstartUpdate')[0].value;
+        let endDate = $('#HXendUpdate')[0].value;
+        let ur = $('#HXUpdatedRemoved')[0].innerHTML;
+        let buildings = await readForgeHX.DB.buildings.where(ur).between(startDate,endDate,true,true).filter(building => filter.test(building.JSON)).toArray();
+        let table = buildings.map(b => {
+            building= JSON.parse(b.JSON);
+            if (ur=="updated" && b.removed != "") return "";
+            if (ur!="updated" && b.removed == "") return "";
+            line=`<tr id="${b.id}">`;
+            line+=`<td>${ur=="updated" ? b.updated : b.removed}</td>`;
+            if (ur=="updated") {
+                line+=`<td class="showJSON">${building.name}</td>`;
+            } else {
+                line+=`<td>${building.name}</td>`;
+            }
+            line+=`<td>${b.added}</td>`;
+            line+=`</tr>`;
+            return line;
+        })
+        $('#HXTable tbody').html(table.join())
+        $('.showJSON').on("click", async (e) =>{
+            $("#wikiBuildingJSON").remove()
+            let el = e.target.parentElement;
+            if (el.tagName != "TR") el = el.parentElement;
+
+            let b = await(readForgeHX.DB.buildings.get(el.id))
+
+            if (!b) return;
+
+            let text = document.createElement("div");
+            text.id="wikiBuildingJSON";
+            text.style="width: 100%;white-space: pre-wrap;";
+            let h = '<table style="width: 100%;"><tr><td style="background-color: #13431354">';
+            h += JSON.stringify(JSON.parse(b.JSON),null, "  ");
+            if (b.oldJSON != "") {
+                h += '</td><td style="background-color: #dd060621">';
+                h += JSON.stringify(JSON.parse(b.oldJSON),null, "  ");
+            }
+            h += "</td></tr></table>"
+            text.innerHTML=h;
+            e.target.append(text);
+        })
+    },
+    
     followMouse:(event)=>{
-        readForgeHX.imageContainer.style.left = event.x + "px";
-        readForgeHX.imageContainer.style.top = event.y + "px";
+        readForgeHX.Container.style.left = event.x + "px";
+        readForgeHX.Container.style.top = event.y + "px";
     },
     reset: async ()=> {
         localStorage.removeItem("gameVersion");
