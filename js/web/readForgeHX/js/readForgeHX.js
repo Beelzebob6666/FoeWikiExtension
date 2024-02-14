@@ -24,9 +24,9 @@ let readForgeHX = {
         }
     },
     init: async () => {
-        WikiBox.tabs["readForgeHXFiles"]={title: "Forge HX - Files", html: () => {return readForgeHX.displayFiles()}, callback: () => {readForgeHX.activateFiles()}},
-		WikiBox.tabs["readForgeHXStrings"]={title: "Forge HX - Strings", html: () => {return readForgeHX.displayStrings()}, callback: () => {readForgeHX.activateStrings()}},
-		WikiBox.tabs["readBuildings"]={title: "Buildings List", html: () => {return readForgeHX.displayBuildings()}, callback: () => {readForgeHX.activateBuildings()}},
+        WikiBox.tabs["readForgeHXFiles"]={title: "Forge HX - Files", html: () => {return readForgeHX.displayFiles()}, callback: () => {readForgeHX.activateFiles()}};
+		WikiBox.tabs["readForgeHXStrings"]={title: "Forge HX - Strings", html: () => {return readForgeHX.displayStrings()}, callback: () => {readForgeHX.activateStrings()}};
+		WikiBox.tabs["readBuildings"]={title: "Buildings List", html: () => {return readForgeHX.displayBuildings()}, callback: () => {readForgeHX.activateBuildings()}};
 	
         // wait for DB loaded
 
