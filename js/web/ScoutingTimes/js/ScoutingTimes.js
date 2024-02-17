@@ -76,14 +76,14 @@ ScoutingToWiki = {
 
             
             let string=""
-            string += `*Owner: [[${scoutingTimes.Provinces[i]?.owner?.name}]]\n`;
-            string += `*Scouting Cost: {{ICOI}} ${scoutingTimes.numberWithCommas(scoutingTimes.Provinces[i]?.scoutingCost||0)}\n`;
-            string += `*Scouting Time: {{ITIM}} ${format2(scoutingTimes.Provinces[i].ScoutingTime||0)} from [[${scoutingTimes.Provinces[scoutingTimes.Provinces[i].From].name}]]"\n`;
-            string += `*Sectors: ???\n`;
-            string += `*Infiltration Cost: {{ICOI}} ??? per sector\n`;
-            string += `*Owners Battle Bonus: {{IDEB}} ???%\n`;
-            string += `*Total Loot: ???\n`;
-            string += `*Province Reward: ${rew}`;
+            //string += `*Owner: [[${scoutingTimes.Provinces[i]?.owner?.name}]]\n`;
+            string += `|Scouting Cost: ${scoutingTimes.numberWithCommas(scoutingTimes.Provinces[i]?.scoutingCost||0)}\n`;
+            string += `|Scouting Time: ${format2(scoutingTimes.Provinces[i].ScoutingTime||0)} from [[${scoutingTimes.Provinces[scoutingTimes.Provinces[i].From].name}]]"\n`;
+            //string += `*Sectors: ???\n`;
+            //string += `*Infiltration Cost: {{ICOI}} ??? per sector\n`;
+            //string += `*Owners Battle Bonus: {{IDEB}} ???%\n`;
+            //string += `*Total Loot: ???\n`;
+            //string += `*Province Reward: ${rew}`;
 
             ScoutingToWiki.data[scoutingTimes.Provinces[i].name]=string;
         }
