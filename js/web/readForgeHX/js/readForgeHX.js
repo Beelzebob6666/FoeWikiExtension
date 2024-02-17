@@ -491,10 +491,18 @@ let readForgeHX = {
         })
         $('#HXTable tbody').html(table.join())
         $('.showJSON').on("click", async (e) =>{
-            $("#wikiBuildingJSON").remove()
-            let el = e.target.parentElement;
-            if (el.tagName != "TR") el = el.parentElement;
-
+            
+            let el = e.target
+            while (!el.id) {
+                el= el.parentElement
+            }
+            if (el.id == "wikiBuildingJSON") return;
+            if ($(el).find("#wikiBuildingJSON").length>0) {
+                $("#wikiBuildingJSON").remove();
+                return;
+            }
+            $("#wikiBuildingJSON").remove();
+            
             let b = await(readForgeHX.DB.buildings.get(el.id))
 
             if (!b) return;
@@ -502,11 +510,17 @@ let readForgeHX = {
             let text = document.createElement("div");
             text.id="wikiBuildingJSON";
             text.style="width: 100%;white-space: pre-wrap;";
-            let h = '<table style="width: 100%;"><tr><td style="background-color: #13431354">';
+            let h = '<table style="width: 100%;"><tr><td style="user-select: all;">';
             h += JSON.stringify(JSON.parse(b.JSON),null, "  ");
             if (b.oldJSON != "") {
-                h += '</td><td style="background-color: #dd060621">';
-                h += JSON.stringify(JSON.parse(b.oldJSON),null, "  ");
+                h += '</td><td>';
+                let oldO=JSON.parse(b.oldJSON);
+                let newO=JSON.parse(b.JSON);
+                readForgeHX.JSdiff(oldO,newO)
+                h += 'added/changed: <div  style="background-color: #13431354">'
+                h += JSON.stringify(newO,null, "  ");
+                h += '</div>removed/changed:<div style="background-color: #dd060621">'
+                h += JSON.stringify(oldO,null, "  ") + "</div>";
             }
             h += "</td></tr></table>"
             text.innerHTML=h;
@@ -567,6 +581,20 @@ let readForgeHX = {
         .then(function callback(blob) {
             saveAs(blob, "FoE - Images.zip");
         });
+    },
+
+    JSdiff: (o,n) => {
+        for (i in n) {
+            if (!n[i]) continue
+            if (!o[i]) continue
+            if (JSON.stringify(o[i])==JSON.stringify(n[i])) {
+                delete o[i];
+                delete n[i];
+            } else {
+                readForgeHX.JSdiff(o[i],n[i])
+            }
+        }
+
     }
 
 }
