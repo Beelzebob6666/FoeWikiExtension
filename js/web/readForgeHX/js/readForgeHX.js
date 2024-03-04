@@ -516,7 +516,7 @@ let readForgeHX = {
                 h += '</td><td>';
                 let oldO=JSON.parse(b.oldJSON);
                 let newO=JSON.parse(b.JSON);
-                readForgeHX.JSdiff(oldO,newO)
+                readForgeHX.JSdiff(oldO,newO);
                 h += 'added/changed: <div  style="background-color: #13431354">'
                 h += JSON.stringify(newO,null, "  ");
                 h += '</div>removed/changed:<div style="background-color: #dd060621">'
@@ -591,6 +591,8 @@ let readForgeHX = {
                 delete o[i];
                 delete n[i];
             } else {
+                if (typeof n[i]==="string" || typeof n[i]=== "number" || typeof n[i] === "boolean") continue
+                if (typeof o[i]==="string" || typeof o[i]=== "number" || typeof o[i] === "boolean") continue
                 readForgeHX.JSdiff(o[i],n[i])
             }
         }
