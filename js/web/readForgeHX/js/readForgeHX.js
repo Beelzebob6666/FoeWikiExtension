@@ -296,7 +296,7 @@ let readForgeHX = {
         readForgeHX.updateFiles();
     },
     updateFiles: async () =>{
-        let filter = new RegExp($('#HXfilter')[0].value);
+        let filter = new RegExp($('#HXfilter')[0].value,"i");
         let startDate = $('#HXstartUpdate')[0].value;
         let endDate = $('#HXendUpdate')[0].value;
         let ur = $('#HXUpdatedRemoved')[0].innerHTML;
@@ -394,7 +394,7 @@ let readForgeHX = {
         readForgeHX.updateStrings();
     },
     updateStrings: async () =>{
-        let filter = new RegExp($('#HXfilter')[0].value);
+        let filter = new RegExp($('#HXfilter')[0].value,"i");
         let startDate = $('#HXstartUpdate')[0].value;
         let endDate = $('#HXendUpdate')[0].value;
         let ar = $('#HXAddedRemoved')[0].innerHTML;
@@ -469,7 +469,7 @@ let readForgeHX = {
     },
 
     updateBuildings: async () =>{
-        let filter = new RegExp($('#HXfilter')[0].value);
+        let filter = new RegExp($('#HXfilter')[0].value,"i");
         let startDate = $('#HXstartUpdate')[0].value;
         let endDate = $('#HXendUpdate')[0].value;
         let ur = $('#HXUpdatedRemoved')[0].innerHTML;
@@ -510,7 +510,7 @@ let readForgeHX = {
             let text = document.createElement("div");
             text.id="wikiBuildingJSON";
             text.style="width: 100%;white-space: pre-wrap;";
-            let h = '<table style="width: 100%;"><tr><td style="user-select: all;">';
+            let h = '<table style="width: 100%;"><tr><td style="user-select: all; vertical-align:top">';
             h += JSON.stringify(JSON.parse(b.JSON),null, "  ");
             if (b.oldJSON != "") {
                 h += '</td><td>';
