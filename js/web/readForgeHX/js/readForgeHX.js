@@ -637,20 +637,22 @@ let readForgeHX = {
             let [x1,amount,name] = rew.name.match(/^([+\-]?\d*)x? (.*)$/)||["",1,rew.name]
             amount = Number(amount)
             let icon = ""
-            if (rew.iconAssetName=="icon_fragment") 
+            let fragment = ""
+            if (rew.iconAssetName=="icon_fragment") {
                 icon = icons(rew.assembledReward?.iconAssetName||rew.assembledReward?.subType)
-            else if (rew.type=="unit") 
+                name = name.replace(/Fragments? of/,"")
+                fragment = icons("icon_tooltip_fragment")
+            } else if (rew.type=="unit") {
+
+                name = /nextera/i.test(rew.id)? "of next era" : ""
+                
                 icon = icons(rew.subType=="rogue"?"rogue":(
                     rew.subType.includes("champion")?"chivalry":
                     Unit.Types.filter(x=>x.unitTypeId==rew.subType)[0].unitClass
                     ))
-            else
+            } else
                 icon = icons(rew.iconAssetName)
-            let fragment = ""
-            if (rew.iconAssetName == "icon_fragment"){
-                name = name.replace(/Fragments? of/,"")
-                fragment = icons("icon_tooltip_fragment")
-            }
+            
             return {icon:icon,amount:amount,name:name,fragment:fragment}
         }    
         
@@ -840,10 +842,10 @@ let readForgeHX = {
                         let rewBA=genericEval(levels.BronzeAge.lookup.rewards[product.reward.id])
                         let rewMax=genericEval(levels[maxEra].lookup.rewards[levels[maxEra]?.production?.options?.[oIndex]?.products?.[pIndex]?.reward?.id])
                         
-                        if (rewBA.icon==rewMax.icon) {
+                        if (rewBA.icon+rewBA.name==rewMax.icon+rewMax.name) {
                             prods+=`<tr><td class="isGeneric">${rewBA.icon + range(rewBA.amount,rewMax.amount) + rewBA.fragment + longSpan(rewBA.name) + t + (product.onlyWhenMotivated ? ifMot : "")}</td></tr>`
                         } else {
-                            prods+=`<tr><td class="isGeneric">${rewBA.icon + span(rewBA.amount) + rewBA.fragment + longSpan(rewBA.name) + "<br> - " + rewMax.icon + span(rewMax.amount) + rewMax.fragment + longSpan(rewMax.name) + t + (product.onlyWhenMotivated ? ifMot : "")}</td></tr>`
+                            prods+=`<tr><td class="isGeneric">${rewBA.icon + span(rewBA.amount) + rewBA.fragment + longSpan(rewBA.name) + " - " + rewMax.icon + span(rewMax.amount) + rewMax.fragment + longSpan(rewMax.name) + t + (product.onlyWhenMotivated ? ifMot : "")}</td></tr>`
                         }
                     }
                     if (product.type=="random") {
@@ -875,10 +877,10 @@ let readForgeHX = {
                                 let rewBA=genericEval(levels.BronzeAge.lookup.rewards[random.product.reward.id])
                                 let rewMax=genericEval(levels[maxEra].lookup.rewards[levels[maxEra]?.production?.options?.[oIndex]?.products?.[pIndex]?.products?.[rIndex]?.product?.reward?.id])
                                 
-                                if (rewBA.icon==rewMax.icon) {
+                                if (rewBA.icon+rewBA.name==rewMax.icon+rewBA.name) {
                                     prods+=rewBA.icon + range(rewBA.amount,rewMax.amount) + rewBA.fragment + longSpan(rewBA.name)
                                 } else {
-                                    prods+=rewBA.icon + span(rewBA.amount) + rewBA.fragment + longSpan(rewBA.name) + "<br> - " + rewMax.icon + span(rewMax.amount) + rewMax.fragment + longSpan(rewMax.name)
+                                    prods+=rewBA.icon + span(rewBA.amount) + rewBA.fragment + longSpan(rewBA.name) + " - " + rewMax.icon + span(rewMax.amount) + rewMax.fragment + longSpan(rewMax.name)
                                 }
                             }
                             prods+=`<span class="dropChance">${Math.floor(random.dropChance*100)}%</td></tr>`

@@ -68,6 +68,7 @@
     & td {
         width:300px;
         display:flex;
+        text-wrap-mode: nowrap;
     }
     
     & img {
@@ -86,14 +87,16 @@
     & .inhabitant {
         max-width: unset;
         position: absolute;
-        left: 40px;
+        left: -100px;
         bottom: 10px;
         background: #a4a45d;
+        td:has(&) {
+            position: relative;
+        }
     }
-    
     & .ifMot {
         margin-left:auto;
-        padding-left:10px;
+        padding-left:5px;
         & img {
             padding-right: 0px;
         }
@@ -104,7 +107,7 @@
         margin-top: -4px;
         margin-bottom: -4px;
         & td {
-            width: 280px;
+            width: 270px;
         }
         .dropChance {
             flex-basis: 33px;
@@ -129,7 +132,6 @@
         top: 0;
         left: 0;
         display:inline-block; 
-        white-space: nowrap;
         animation-name: bounce;
         animation-duration: 7s;
         animation-iteration-count: infinite;
