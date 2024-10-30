@@ -17,6 +17,9 @@ let readForgeHX = {
                 strings: 'id,added,removed',
             });
             db.version(2).stores({
+                buildings: 'id,rawJSON,added,updated,removed,oldJSON',
+            });
+            db.version(3).stores({
                 buildings: 'id,JSON,added,updated,removed,oldJSON',
             });
             
@@ -43,7 +46,7 @@ let readForgeHX = {
         const HXloaded = await isElementLoaded()
         if (!HXloaded) return;
         if (!readForgeHX.newVersion()) return;
-        readForgeHX.getDateFromVersion();
+        
         await readForgeHX.files();
         await readForgeHX.strings();
         await readForgeHX.buildings();
@@ -223,13 +226,8 @@ let readForgeHX = {
     },
 
     newVersion:()=>{
-        let copy = srcLinks.raw+"";
-        let startString = 'this._systemInfo=["';
-        let start = copy.indexOf(startString) + startString.length;
-        copy = copy.substring(start);
-
-        let end = copy.indexOf('"');
-        let v = copy.substring(0, end);
+        let v = srcLinks.raw.match(/this._systemInfo=\["(.*?)"/)[1]
+        readForgeHX.versionDate = moment(v.match(/\((.*?)\)/)[1],'DD.MM.YYYY hh:mm').format("YYYY-MM-DD");
         if (readForgeHX.gameVersion != v) {
             readForgeHX.gameVersion = v;
             localStorage.setItem("gameVersion",readForgeHX.gameVersion)
@@ -244,13 +242,7 @@ let readForgeHX = {
             return false;
         }
     },
-    getDateFromVersion:()=>{
-        startString = '(';
-        start = readForgeHX.gameVersion.indexOf(startString) + startString.length;
-        v = readForgeHX.gameVersion.substring(start);
-        end = v.indexOf(')');
-        readForgeHX.versionDate = moment(v.substring(0, end),'DD.MM.YYYY hh:mm').format("YYYY-MM-DD");
-    },
+
     displayFiles: async () => {
         let dates = await readForgeHX.DB.files.orderBy('updated').reverse().uniqueKeys();
         
