@@ -162,10 +162,19 @@ let readForgeHX = {
     buildings: async () => {
         
         let OldB = await readForgeHX.DB.buildings.where("removed").equals("").toArray();
+        const isBuildingDataLoded = async () => {
+            while (!MainParser.CityEntities) {
+                await new Promise( resolve => requestAnimationFrame(resolve))
+            }
+            return true;
+        };
+        await isBuildingDataLoded()
+        
         let Old={};
         OldB.forEach(a => Old[a.id] = a.JSON);
 
         let New = {};
+
         for (let i in MainParser.CityEntities) {
             New[i]=JSON.stringify(MainParser.CityEntities[i]);
         }
