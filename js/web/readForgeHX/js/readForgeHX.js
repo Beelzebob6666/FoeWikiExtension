@@ -487,7 +487,7 @@ let readForgeHX = {
 
         let meta=JSON.parse(b.JSON)
 
-        let h = `<div style="width:900px"><table class="foe-table" style="width: 100%;"><tr><td style="min-width:200px;max-width:200px; vertical-align:top">`+
+        let h = `<div style="width:min-content"><table class="foe-table" style="width: 100%;"><tr><td style="min-width:200px;max-width:200px; vertical-align:top">`+
                 `<div style="color:var(--text-bright);font-weight:600;text-decoration: underline;">${meta.name}</div>`+
                 `<img src="${srcLinks.get("/city/buildings/"+meta.asset_id.replace(/^(\D_)(.*?)/,"$1SS_$2")+".png",true)}" style="max-width:200px"></td>`+
                 `<td style="width:100%; vertical-align:top"">Current Version:`;
