@@ -303,7 +303,7 @@ let readForgeHX = {
             line=`<tr class="clickToSelect" id="${file.id}">`;
             line+=`<td>${ur=="updated" ? file.updated : file.removed}</td>`;
             if (ur=="updated") {
-                line+=`<td class="helperTT" data-callback_tt="readForgeHX.ImageTT"><a href="${srcLinks.get(file.id,true)}" target="_blank">${file.id}</a></td>`;
+                line+=`<td ${["jpg","png"].includes(file.id.split(".").pop()) ? 'class="helperTT" data-callback_tt="readForgeHX.ImageTT"':''}><a href="${srcLinks.get(file.id,true)}" target="_blank">${file.id}</a></td>`;
             } else {
                 line+=`<td>${file.id}</td>`;
             }
@@ -335,12 +335,8 @@ let readForgeHX = {
 
     ImageTT: (e) =>{
         let h=e.target.firstChild.href;
-        if (!h) h= e.target.href;
-        let split= h.split(".");
-        let type = split[split.length-1]
-        if (["jpg","png"].includes(type)) 
-            return `<img src="${h}" style="max-width: 300px;max-height: 300px;">`
-        return ""
+        if (!h) h = e.target.href;
+        return  ["jpg","png"].includes(h.split(".").pop()) ? `<img src="${h}" style="max-width: 300px;max-height: 300px;">` : ""
     },
 
     displayStrings: async () => {
