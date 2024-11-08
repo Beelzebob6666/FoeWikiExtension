@@ -262,7 +262,8 @@ let readForgeHX = {
         out += `<th>path<br/>
                     <input id= HXfilter type="text" size="20">
                     <button class="btn-default" onclick="readForgeHX.copyLinks()">Copy Links</button>
-                    <button class="btn-default" onclick="readForgeHX.copyLinks(true)">Copy Links for Forum</button>
+                    <button class="btn-default" onclick="readForgeHX.copyLinks('discord')">Copy Links for Discord</button>
+                    <button class="btn-default" onclick="readForgeHX.copyLinks('forum')">Copy Links for Forum</button>
                     <button class="btn-default" onclick="readForgeHX.download()">Download Images</button></th>`
         out += '<th>added</th>'
         out += `</tr></thead><tbody></tbody></table>`;
@@ -514,13 +515,19 @@ let readForgeHX = {
         localStorage.removeItem("gameVersion");
         x= readForgeHX.DB.delete();
     },
-    copyLinks:(forum=false)=>{
+    copyLinks:(type=null)=>{
         let links = $('.clickToSelect.selected a')
         if (links.length == 0) return
 
         let l=[]
         for (x=0;x<links.length;x++) {
-            l.push(forum ? "[IMG]" + links[x].href + "[/IMG]" : links[x].href)
+            if (type == "forum") {
+                l.push("[IMG]" + links[x].href + "[/IMG]")
+            } else if (type == "discord") {
+                l.push("- ["+links[x].href.split("/").pop()+"](" + links[x].href + ")")
+            } else
+                l.push(links[x].href)
+
         }
         helper.str.copyToClipboard(l.join("\n"))
     },
