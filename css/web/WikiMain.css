@@ -31,13 +31,13 @@
 #HXTable {
     width: 100%;
     table-layout: fixed;
-    &>thead>tr>th {
+    &>thead>tr {
         position: sticky;
         top: 0px;
-        &:first-child {
+        &td:first-child {
             width:130px;
         }
-        &:nth-child(3) {
+        &td:last-child {
             width:80px;
         }
     }
