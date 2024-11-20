@@ -29,25 +29,29 @@
 }
 
 #HXTable {
-    width: 100%;
     table-layout: fixed;
-    &>thead>tr {
-        position: sticky;
-        top: 0px;
-        &td:first-child {
-            width:130px;
-        }
-        &td:last-child {
-            width:80px;
-        }
-    }
-    & tr.selected {
-        background: rgba(0,0,0,.4);
-    }
-    &>tbody>tr>td:nth-child(2) {
-        display: block;
-    }
 }
+#HXTable thead tr {
+    position: sticky;
+    top: 0px;
+    z-index: 1;
+}
+#HXTable th:first-child {
+    width:130px;
+}
+#HXTable th:last-child {
+    width:80px;
+}
+#HXTable th:nth-child(2) {
+    width:100%;
+}
+#HXTable tr.selected {
+        background: rgba(0,0,0,.4);
+}
+#HXTable tbody tr td:nth-child(2) {
+    display: block;
+}
+
 #wikiBuildingJSON>table {
     width: 100%;
     table-layout: fixed;
