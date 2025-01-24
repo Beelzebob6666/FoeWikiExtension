@@ -489,11 +489,11 @@ let readForgeHX = {
                 <table class="foe-table">
                 <tr><td class="imgContainer"><img src="${srcLinks.get("/city/buildings/"+meta.asset_id.replace(/^(\D_)(.*?)/,"$1SS_$2")+".png",true)}"></td>`+
                 `<td style="width:100%; vertical-align:top"">Current Version:`;
-        h += Tooltips.BuildingData(meta);
+        h += await Tooltips.BuildingData(meta);
         if (b.oldJSON != "") {
             meta = JSON.parse(b.oldJSON)
             h += '</td><td style="width:100%; vertical-align:top"">Previous Version:';
-            h += Tooltips.BuildingData(meta);
+            h += await Tooltips.BuildingData(meta);
         }
         h += "</td></tr></table></div>"
         setTimeout(()=>{
