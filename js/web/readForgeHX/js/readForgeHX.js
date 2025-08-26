@@ -494,6 +494,14 @@ let readForgeHX = {
             meta = JSON.parse(b.oldJSON)
             h += '</td><td style="width:100%; vertical-align:top"">Previous Version:';
             h += await Tooltips.BuildingData(meta);
+           /* h += '</td><td>';
+            let oldO=JSON.parse(b.oldJSON);
+            let newO=JSON.parse(b.JSON);
+            readForgeHX.JSdiff(oldO,newO);
+            h += 'added/changed: <div  style="background-color: #13431354">'
+            h += JSON.stringify(newO,null, "  ");
+            h += '</div>removed/changed:<div style="background-color: #dd060621">'
+            h += JSON.stringify(oldO,null, "  ") + "</div>";*/
         }
         h += "</td></tr></table></div>"
         setTimeout(()=>{
@@ -564,6 +572,21 @@ let readForgeHX = {
             saveAs(blob, "FoE - Images.zip");
         });
     },
+    JSdiff: (o,n) => {
+        for (i in n) {
+            if (!n[i]) continue
+            if (!o[i]) continue
+            if (JSON.stringify(o[i])==JSON.stringify(n[i])) {
+                delete o[i];
+                delete n[i];
+            } else {
+                if (typeof n[i]==="string" || typeof n[i]=== "number" || typeof n[i] === "boolean") continue
+                if (typeof o[i]==="string" || typeof o[i]=== "number" || typeof o[i] === "boolean") continue
+                readForgeHX.JSdiff(o[i],n[i])
+            }
+        }
+
+    },
 
 }
 
@@ -616,20 +639,6 @@ readForgeHX.init()
 
         })
                   
-    JSdiff: (o,n) => {
-        for (i in n) {
-            if (!n[i]) continue
-            if (!o[i]) continue
-            if (JSON.stringify(o[i])==JSON.stringify(n[i])) {
-                delete o[i];
-                delete n[i];
-            } else {
-                if (typeof n[i]==="string" || typeof n[i]=== "number" || typeof n[i] === "boolean") continue
-                if (typeof o[i]==="string" || typeof o[i]=== "number" || typeof o[i] === "boolean") continue
-                readForgeHX.JSdiff(o[i],n[i])
-            }
-        }
 
-    },
   
 */
