@@ -42,10 +42,10 @@ WikiBox = {
                 'resize': true,
             });
 
-			body='<div id="WikiTabber">'
+			body='<div id="WikiTabber" class="btn-group">'
 			for (tab in WikiBox.tabs) {
 				if (!WikiBox.tabs[tab]) continue;
-				body += `<div class="WikiTab btn-default ${tab==WikiBox.selected?'btn-active':''}" data-tab="${tab}" onclick="WikiBox.update(event)">${WikiBox.tabs[tab].title}</div>`
+				body += `<div class="WikiTab btn ${tab==WikiBox.selected?'btn-active':''}" data-tab="${tab}" onclick="WikiBox.update(event)">${WikiBox.tabs[tab].title}</div>`
 			}			
 			body+='<input type="checkbox" id="OpenWiki" checked>Open link to Wiki</input></div><div id="WikiOutput"></div>'
 			$("#WikiBoxBody").html(body)

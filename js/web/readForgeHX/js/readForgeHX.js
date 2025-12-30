@@ -261,10 +261,10 @@ let readForgeHX = {
                     - <input type="date" id="HXendUpdate" value="${dates[0]}"></input></th>`
         out += `<th>path<br/>
                     <input id= HXfilter type="text" size="20">
-                    <button class="btn-default" onclick="readForgeHX.copyLinks()">Copy Links</button>
-                    <button class="btn-default" onclick="readForgeHX.copyLinks('discord')">Copy Links for Discord</button>
-                    <button class="btn-default" onclick="readForgeHX.copyLinks('forum')">Copy Links for Forum</button>
-                    <button class="btn-default" onclick="readForgeHX.download()">Download Images</button></th>`
+                    <button class="btn" onclick="readForgeHX.copyLinks()">Copy Links</button>
+                    <button class="btn" onclick="readForgeHX.copyLinks('discord')">Copy Links for Discord</button>
+                    <button class="btn" onclick="readForgeHX.copyLinks('forum')">Copy Links for Forum</button>
+                    <button class="btn" onclick="readForgeHX.download()">Download Images</button></th>`
         out += '<th>added</th>'
         out += `</tr></thead><tbody></tbody></table>`;
         return out
@@ -350,7 +350,7 @@ let readForgeHX = {
                         - <input type="date" id="HXendUpdate" value="${dates[0]}"></input></th>`
             out += `<th>string <br/>
                         <input id= HXfilter type="text" size="20">
-                        <button class="btn-default" onclick="readForgeHX.copy()">Copy</button></th>`
+                        <button class="btn" onclick="readForgeHX.copy()">Copy</button></th>`
         out += `</tr></thead><tbody></tbody></table>`
         return out
 

@@ -177,12 +177,12 @@ CumulativeTech = {
 			out +='<h2>Output the Cumulative Tech page for the respective Era</h2><div class="btn-group" style="flex-wrap:wrap">'
 			for (era in CumulativeTech.Output) {
 				if (!CumulativeTech.Output[era]) continue;
-				out += `<div class="btn-default" data-era="${era}" style="flex-grow:1" onclick="CumulativeTech.CopyEra(event)">${CumulativeTech.WikiTranslate[era]}</div>`
+				out += `<div class="btn" data-era="${era}" style="flex-grow:1" onclick="CumulativeTech.CopyEra(event)">${CumulativeTech.WikiTranslate[era]}</div>`
 			}			
 			out+='</div><h2>Output the CSS for the Tech Images</h2>';
-			out+='<div class="btn-group" style="flex-wrap:wrap"><div class="btn-default" onclick="CumulativeTech.CopyCSS()">Copy CSS for Tech Icons</div>';
+			out+='<div class="btn-group" style="flex-wrap:wrap"><div class="btn" onclick="CumulativeTech.CopyCSS()">Copy CSS for Tech Icons</div>';
 			let link = srcLinks.get("/research/technology_icons/technology_icons_0.jpg",true)
-			out+=`<a href="${link}" class="btn-default" target="_blank">Current Tech Image</a></div>`;	
+			out+=`<a href="${link}" class="btn" target="_blank">Current Tech Image</a></div>`;	
 		}
 		out+='<h2>Settings for Export</h2>';
 		out+=`<textarea width="100%" id="CumulativeTechSettings" onfocusout="CumulativeTech.SaveSettings()">${JSON.stringify(CumulativeTech.WikiTranslate).replace(/,/g,",\n").replace("{","{\n").replace('"}','"\n}')}</textarea>`;
