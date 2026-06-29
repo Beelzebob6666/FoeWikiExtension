@@ -89,13 +89,13 @@ CumulativeTech = {
 			}
 			wiki += "\n|Requires=";
 			let req=[];
-			for (let t of tech.parentTechnologies) {
+			for (let t of tech.parents) {
 				req.push (`{{ITEC}} [[${tech.era != eras[t] ? trans(eras[t]) + " Technologies":""}#${techs[t]}|${techs[t]}]]`)
 			}
 			wiki += req.join("<br>");
 			wiki += "\n|LeadsTo=";
 			let lead=[]
-			for (let t of tech.childTechnologies) {
+			for (let t of tech.children) {
 				lead.push (`{{ITEC}} [[${tech.era != eras[t] ? trans(eras[t]) + " Technologies":""}#${techs[t]}|${techs[t]}]]`)
 			}
 			wiki += lead.join("<br>");
@@ -163,7 +163,7 @@ CumulativeTech = {
 			out.push(`}\n`)
 		}
 		CumulativeTech.CSS=out.join(`\n`)
-		FoEproxy.removeRawHandler(CumulativeTech.CSSCreate);
+		WikiProxy.removeRawHandler(CumulativeTech.CSSCreate);
 		setTimeout(WikiBox.update,1000) 
 	},
 
@@ -217,8 +217,8 @@ CumulativeTech = {
 	
 }
 
-FoEproxy.addRawHandler(CumulativeTech.CSSCreate)
-FoEproxy.addMetaHandler("research_eras",(response)=>{
+WikiProxy.addRawHandler(CumulativeTech.CSSCreate)
+WikiProxy.addMetaHandler("research_eras",(response)=>{
 	let eras = JSON.parse(response.responseText)
 	for (let x of eras) {
 		if (!CumulativeTech.WikiTranslate[x.era]) CumulativeTech.WikiTranslate[x.era] = x.name;

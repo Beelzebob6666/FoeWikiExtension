@@ -91,7 +91,7 @@ ScoutingToWiki = {
 }
 ScoutingToWiki.init()
 
-FoEproxy.addHandler("CampaignService","start",()=>{
+WikiProxy.addHandler("CampaignService","start",()=>{
 	setTimeout(() => {
         WikiBox.update()
     }, 100);

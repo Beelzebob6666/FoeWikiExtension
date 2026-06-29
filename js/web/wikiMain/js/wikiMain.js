@@ -5,15 +5,21 @@ const WikiMayRun = new Promise(resolve => {
 	}, {capture: false, once: true, passive: true});
 });
 
+let WikiProxy = {}
 wiki_proxy_detect ()
 
 async function wiki_proxy_detect () {
 	
 	
-	while (typeof FoEproxy == "undefined") await new Promise((resolve) => {
+	while (typeof FoEproxy == "undefined" && typeof FH?.proxy == "undefined") await new Promise((resolve) => {
 		// @ts-ignore
 		requestIdleCallback(resolve);
 	});
+	if (typeof FoEproxy == "undefined") {
+		WikiProxy = FH.proxy;
+	} else {
+		WikiProxy = FoEproxy;
+	}
 
 	window.dispatchEvent(new CustomEvent('foe-wiki#proxyloaded'));
 	

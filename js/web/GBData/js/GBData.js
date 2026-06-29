@@ -360,7 +360,7 @@ GBData = {
 
 GBData.init()
 
-FoEproxy.addHandler("CampaignService","start",()=>{
+WikiProxy.addHandler("CampaignService","start",()=>{
 	setTimeout(() => {
         WikiBox.update()
     }, 100);
