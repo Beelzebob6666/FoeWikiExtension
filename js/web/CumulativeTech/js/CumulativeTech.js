@@ -56,7 +56,7 @@ CumulativeTech = {
 	
 	createOutput:() => {
 		if (!Technologies.AllTechnologies) return;
-		if (!MainParser.CityEntities) return;
+		if (!FH.Main.CityEntities) return;
 		if (!GoodsData) return;
 		CumulativeTech.Output = {}
 
@@ -104,7 +104,7 @@ CumulativeTech = {
 			if (tech.rewards) {
 				for (let r of tech.rewards) {
 					if (r.type=="building") {
-						unl.push (`${trans(MainParser.CityEntities[r.value].type)} [[${MainParser.CityEntities[r.value].name}]]`)
+						unl.push (`${trans(FH.Main.CityEntities[r.value].type)} [[${FH.Main.CityEntities[r.value].name}]]`)
 					} else if (r.type=="unlockable_feature") {
 						unl.push (trans(r.value))
 

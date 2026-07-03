@@ -11,14 +11,14 @@ wiki_proxy_detect ()
 async function wiki_proxy_detect () {
 	
 	
-	while (typeof FoEproxy == "undefined" && typeof FH?.proxy == "undefined") await new Promise((resolve) => {
+	while (typeof FH.proxy == "undefined" && typeof FH?.proxy == "undefined") await new Promise((resolve) => {
 		// @ts-ignore
 		requestIdleCallback(resolve);
 	});
-	if (typeof FoEproxy == "undefined") {
+	if (typeof FH.proxy == "undefined") {
 		WikiProxy = FH.proxy;
 	} else {
-		WikiProxy = FoEproxy;
+		WikiProxy = FH.proxy;
 	}
 
 	window.dispatchEvent(new CustomEvent('foe-wiki#proxyloaded'));
@@ -39,7 +39,7 @@ WikiBox = {
 	show: () => {
 		if ($('#WikiBox').length < 1) {
 
-            HTML.Box({
+           FH.HTML.Box({
                 'id': 'WikiBox',
                 'title': 'Helper for extracting data from Game to wiki',
                 'auto_close': true,
@@ -59,7 +59,7 @@ WikiBox = {
             WikiBox.update();
 
         } else {
-            HTML.CloseOpenBox('WikiBox');
+           FH.HTML.CloseOpenBox('WikiBox');
         }
 	},
 	update: async (evt) => {

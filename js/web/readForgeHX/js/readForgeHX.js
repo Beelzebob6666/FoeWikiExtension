@@ -105,7 +105,7 @@ let readForgeHX = {
             info += toRemove.length + " removed";
         }
         if (info !="") {
-            HTML.ShowToastMsg({
+           FH.HTML.ShowToastMsg({
                 head: 'Files',
                 text: info,
                 type: 'info',
@@ -150,7 +150,7 @@ let readForgeHX = {
             info += toRemove.length + " removed";
         }
         if (info !="") {
-            HTML.ShowToastMsg({
+           FH.HTML.ShowToastMsg({
                 head: 'Strings',
                 text: info,
                 type: 'info',
@@ -163,7 +163,7 @@ let readForgeHX = {
         
         let OldB = await readForgeHX.DB.buildings.where("removed").equals("").toArray();
         const isBuildingDataLoded = async () => {
-            while (!MainParser.CityEntities) {
+            while (!FH.Main.CityEntities) {
                 await new Promise( resolve => requestAnimationFrame(resolve))
             }
             return true;
@@ -175,8 +175,8 @@ let readForgeHX = {
 
         let New = {};
 
-        for (let i in MainParser.CityEntities) {
-            New[i]=JSON.stringify(MainParser.CityEntities[i]);
+        for (let i in FH.Main.CityEntities) {
+            New[i]=JSON.stringify(FH.Main.CityEntities[i]);
         }
         
         let toUpdate = {};
@@ -223,7 +223,7 @@ let readForgeHX = {
             info += toRemove.length + " removed";
         }
         if (info !="") {
-            HTML.ShowToastMsg({
+           FH.HTML.ShowToastMsg({
                 head: 'Buildings',
                 text: info,
                 type: 'info',
@@ -238,7 +238,7 @@ let readForgeHX = {
         if (readForgeHX.gameVersion != v) {
             readForgeHX.gameVersion = v;
             localStorage.setItem("gameVersion",readForgeHX.gameVersion)
-            HTML.ShowToastMsg({
+           FH.HTML.ShowToastMsg({
                 head: 'New Version',
                 text: readForgeHX.gameVersion,
                 type: 'info',
