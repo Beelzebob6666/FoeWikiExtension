@@ -1,6 +1,6 @@
 
 const WikiMayRun = new Promise(resolve => {
-	window.addEventListener('foe-helper#loaded', evt => {
+	window.addEventListener('forgehammer#loaded', evt => {
 		resolve();
 	}, {capture: false, once: true, passive: true});
 });

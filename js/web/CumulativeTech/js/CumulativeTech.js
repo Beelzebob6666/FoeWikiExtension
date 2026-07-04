@@ -57,7 +57,7 @@ CumulativeTech = {
 	createOutput:() => {
 		if (!Technologies.AllTechnologies) return;
 		if (!FH.Main.CityEntities) return;
-		if (!GoodsData) return;
+		if (!FH.Goods.Data) return;
 		CumulativeTech.Output = {}
 
 		let numberWithCommas = (x) => {
@@ -85,7 +85,7 @@ CumulativeTech = {
 			for (let g in tech.requirements.resources) {
 				if (!tech.requirements.resources[g]) continue;
 				if (g == "supplies" || g=="money") continue;
-				wiki += `{{${GoodsData[g].name}}} ` + numberWithCommas(tech.requirements.resources[g]) + " ";
+				wiki += `{{${FH.Goods.Data[g].name}}} ` + numberWithCommas(tech.requirements.resources[g]) + " ";
 			}
 			wiki += "\n|Requires=";
 			let req=[];
