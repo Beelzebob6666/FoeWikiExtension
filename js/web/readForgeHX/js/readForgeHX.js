@@ -32,6 +32,9 @@ let readForgeHX = {
         // wait for DB loaded
 
         await WikiMayRun;
+        
+        FH.Tooltips.addCallback("HXimage",readForgeHX.ImageTT)
+        FH.Tooltips.addCallback("HXbuilding",readForgeHX.buildingTT)
         await readForgeHX.database.open();
         // wait for ForgeHX is loaded, then read the full script url
         const isElementLoaded = async () => {
@@ -48,6 +51,7 @@ let readForgeHX = {
         await readForgeHX.files();
         await readForgeHX.strings();
         await readForgeHX.buildings();
+
     },
     files: async () => {
         let HXscript = srcLinks.raw+"";
@@ -303,7 +307,7 @@ let readForgeHX = {
             line=`<tr class="clickToSelect" id="${file.id}">`;
             line+=`<td>${ur=="updated" ? file.updated : file.removed}</td>`;
             if (ur=="updated") {
-                line+=`<td ${["jpg","png"].includes(file.id.split(".").pop()) ? 'class="helperTT" data-callback_tt="readForgeHX.ImageTT"':''}><a href="${srcLinks.get(file.id,true)}" target="_blank">${file.id}</a></td>`;
+                line+=`<td ${["jpg","png"].includes(file.id.split(".").pop()) ? 'class="helperTT" data-callback_tt="HXimage"':''}><a href="${srcLinks.get(file.id,true)}" target="_blank">${file.id}</a></td>`;
             } else {
                 line+=`<td>${file.id}</td>`;
             }
@@ -462,7 +466,7 @@ let readForgeHX = {
             line=`<tr id="${b.id}">`;
             line+=`<td>${ur=="updated" ? b.updated : b.removed}</td>`;
             if (ur=="updated") {
-                line+=`<td class="helperTT" data-callback_tt="readForgeHX.buildingTT">${building.name}</td>`;
+                line+=`<td class="helperTT" data-callback_tt="HXbuilding">${building.name}</td>`;
             } else {
                 line+=`<td>${building.name}</td>`;
             }
@@ -489,11 +493,11 @@ let readForgeHX = {
                 <table class="foe-table">
                 <tr><td class="imgContainer"><img src="${srcLinks.get("/city/buildings/"+meta.asset_id.replace(/^(\D_)(.*?)/,"$1SS_$2")+".png",true)}"></td>`+
                 `<td style="width:100%; vertical-align:top"">Current Version:`;
-        h += await Tooltips.BuildingData(meta);
+        h += await FH.Tooltips.BuildingData(meta);
         if (b.oldJSON != "") {
             meta = JSON.parse(b.oldJSON)
             h += '</td><td style="width:100%; vertical-align:top"">Previous Version:';
-            h += await Tooltips.BuildingData(meta);
+            h += await FH.Tooltips.BuildingData(meta);
            /* h += '</td><td>';
             let oldO=JSON.parse(b.oldJSON);
             let newO=JSON.parse(b.JSON);
