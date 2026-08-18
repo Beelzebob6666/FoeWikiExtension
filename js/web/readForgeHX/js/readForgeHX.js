@@ -449,11 +449,33 @@ let readForgeHX = {
             e.target.innerHTML = e.target.innerHTML == "updated" ? "removed" : "updated";
             readForgeHX.updateBuildings()
         });
+        $('#WikiBox').on("click", '.JSdiff',  async (e)=>{
+            
+            if ($('#JSdiff').length > 0) {
+                $('#JSdiff').remove()
+                return;
+            }
+
+            let el = e.target
+            while (!el.id) {
+                el= el.parentElement
+            }
+            let b = await(readForgeHX.DB.buildings.get(el.id))
+            if (!b) return;
+
+            if (!b.oldJSON || b.oldJSON == "") return
+            let oldO=JSON.parse(b.oldJSON);
+            let newO=JSON.parse(b.JSON);
+            
+            $(readForgeHX.buildDiffHtml(oldO, newO)).appendTo(e.target)
+        });
+        
 
         readForgeHX.updateBuildings();
     },
 
     updateBuildings: async () =>{
+        if ($('#HXfilter').length == 0) return
         let filter = new RegExp($('#HXfilter')[0].value,"i");
         let startDate = $('#HXstartUpdate')[0].value;
         let endDate = $('#HXendUpdate')[0].value;
@@ -466,7 +488,7 @@ let readForgeHX = {
             line=`<tr id="${b.id}">`;
             line+=`<td>${ur=="updated" ? b.updated : b.removed}</td>`;
             if (ur=="updated") {
-                line+=`<td class="helperTT" data-callback_tt="HXbuilding">${building.name}</td>`;
+                line+=`<td class="helperTT JSdiff" data-callback_tt="HXbuilding">${building.name}</td>`;
             } else {
                 line+=`<td>${building.name}</td>`;
             }
@@ -498,14 +520,6 @@ let readForgeHX = {
             meta = JSON.parse(b.oldJSON)
             h += '</td><td style="width:100%; vertical-align:top"">Previous Version:';
             h += await FH.Tooltips.BuildingData(meta);
-           /* h += '</td><td>';
-            let oldO=JSON.parse(b.oldJSON);
-            let newO=JSON.parse(b.JSON);
-            readForgeHX.JSdiff(oldO,newO);
-            h += 'added/changed: <div  style="background-color: #13431354">'
-            h += JSON.stringify(newO,null, "  ");
-            h += '</div>removed/changed:<div style="background-color: #dd060621">'
-            h += JSON.stringify(oldO,null, "  ") + "</div>";*/
         }
         h += "</td></tr></table></div>"
         setTimeout(()=>{
@@ -520,6 +534,56 @@ let readForgeHX = {
         return h
     },
     
+    escapeHtml: (value) => {
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    },
+    buildDiffHtml: (oldValue, newValue) => {
+        let oldLines = JSON.stringify(oldValue, null, 2).split("\n");
+        let newLines = JSON.stringify(newValue, null, 2).split("\n");
+        let lcs = Array.from({length: oldLines.length + 1}, () => Array(newLines.length + 1).fill(0));
+
+        for (let i = oldLines.length - 1; i >= 0; i--) {
+            for (let j = newLines.length - 1; j >= 0; j--) {
+                if (oldLines[i] === newLines[j]) {
+                    lcs[i][j] = lcs[i + 1][j + 1] + 1;
+                } else {
+                    lcs[i][j] = Math.max(lcs[i + 1][j], lcs[i][j + 1]);
+                }
+            }
+        }
+
+        let diff = [];
+        let i = 0;
+        let j = 0;
+
+        while (i < oldLines.length || j < newLines.length) {
+            if (i < oldLines.length && j < newLines.length && oldLines[i] === newLines[j]) {
+                diff.push({type: "unchanged", text: oldLines[i]});
+                i++;
+                j++;
+            } else if (j < newLines.length && (i === oldLines.length || lcs[i][j + 1] >= lcs[i + 1][j])) {
+                diff.push({type: "added", text: newLines[j]});
+                j++;
+            } else if (i < oldLines.length) {
+                diff.push({type: "removed", text: oldLines[i]});
+                i++;
+            }
+        }
+
+        let rows = diff.map(entry => {
+            let color = entry.type === "added" ? "#1a7f37" : entry.type === "removed" ? "#cf222e" : "#24292f";
+            let background = entry.type === "added" ? "rgba(46, 160, 67, 0.12)" : entry.type === "removed" ? "rgba(207, 34, 46, 0.12)" : "transparent";
+            let prefix = entry.type === "added" ? "+" : entry.type === "removed" ? "-" : " ";
+            return `<div style="color:${color};background:${background};white-space:pre-wrap;">${prefix}${readForgeHX.escapeHtml(entry.text || "")}</div>`;
+        });
+
+        return `<div id="JSdiff" style="margin-top:10px;"><div style="font-weight:bold;margin-bottom:6px;">Changes</div><pre style="margin:0;padding:8px;background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;overflow:auto;white-space:pre-wrap;word-break:break-word;font-family:monospace;font-size:12px;">${rows.join("")}</pre></div>`;
+    },
     reset: async ()=> {
         localStorage.removeItem("gameVersion");
         x= readForgeHX.DB.delete();
