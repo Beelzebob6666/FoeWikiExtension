@@ -78,14 +78,15 @@ CumulativeTech = {
 			if (!CumulativeTech.Output[tech.era]) CumulativeTech.Output[tech.era] = [`This is a list of all [[Technology|technologies]] of the [[${trans(tech.era)}]].<div class="flex-container">`] 
 			let wiki = "{{TechBoxNew|" + tech.name + "|" + tech.id;
 			if (tech.maxSP) wiki += "|FP=" + numberWithCommas(tech.maxSP);
-			if (tech.requirements.resources.money) wiki += "|Coins=" + numberWithCommas(tech.requirements.money);
-			if (tech.requirements.resources.supplies) wiki += "|Supplies=" + numberWithCommas(tech.requirements.supplies);
+			let res = tech.requirements?.resources || tech.cost?.resources || {};
+			if (res.money) wiki += "|Coins=" + numberWithCommas(res.money);
+			if (res.supplies) wiki += "|Supplies=" + numberWithCommas(res.supplies);
 			wiki += "|Age=" + trans(tech.era);
 			wiki += "\n|Goods=";
-			for (let g in tech.requirements.resources) {
-				if (!tech.requirements.resources[g]) continue;
+			for (let g in res || {}) {
+				if (!res[g]) continue;
 				if (g == "supplies" || g=="money") continue;
-				wiki += `{{${FH.Goods.Data[g].name}}} ` + numberWithCommas(tech.requirements.resources[g]) + " ";
+				wiki += `{{${FH.Goods.Data[g].name}}} ` + numberWithCommas(res[g]) + " ";
 			}
 			wiki += "\n|Requires=";
 			let req=[];
