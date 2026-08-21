@@ -510,18 +510,26 @@ let readForgeHX = {
 
         let meta=JSON.parse(b.JSON)
 
-        let h = `<div class="buildingTT">
+        let h = `
+            <div class="buildingTT">
                 <h2>${meta.name}</h2>
                 <table class="foe-table">
-                <tr><td class="imgContainer"><img src="${srcLinks.get("/city/buildings/"+meta.asset_id.replace(/^(\D_)(.*?)/,"$1SS_$2")+".png",true)}"></td>`+
-                `<td style="width:100%; vertical-align:top"">Current Version:`;
-        h += await FH.Tooltips.BuildingData(meta);
-        if (b.oldJSON != "") {
-            meta = JSON.parse(b.oldJSON)
-            h += '</td><td style="width:100%; vertical-align:top"">Previous Version:';
-            h += await FH.Tooltips.BuildingData(meta);
-        }
-        h += "</td></tr></table></div>"
+                    <tr>
+                        <td class="imgContainer">
+                            <img class="buildingPrev" src="${srcLinks.get("/city/buildings/"+meta.asset_id.replace(/^(\D_)(.*?)/,"$1SS_$2")+".png",true)}">
+                            ${await FH.Tooltips.SizeTimeRoadData(meta)}
+                        </td>
+                        <td class="buildingTTtable">
+                            Current Data:
+                            ${await FH.Tooltips.BuildingData(meta)}
+                        </td>
+                        <td class="buildingTTtable">
+                            Previous Data:
+                            ${b.oldJSON != "" ? await FH.Tooltips.BuildingData(JSON.parse(b.oldJSON)) : "" } 
+                        </td>
+                    </tr>
+                </table>
+            </div>`
         setTimeout(()=>{
             $(".handleOverflow").each((index,e)=>{
                 let w= ((e.scrollWidth - e.parentNode.clientWidth) || 0)
