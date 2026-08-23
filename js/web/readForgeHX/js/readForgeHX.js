@@ -516,17 +516,18 @@ let readForgeHX = {
                 <table class="foe-table">
                     <tr>
                         <td class="imgContainer">
-                            <img class="buildingPrev" src="${srcLinks.get("/city/buildings/"+meta.asset_id.replace(/^(\D_)(.*?)/,"$1SS_$2")+".png",true)}">
+                            <img class="buildingPrev" src="${srcLinks.getBuilding(meta.asset_id)}">
                             ${await FH.Tooltips.SizeTimeRoadData(meta)}
                         </td>
                         <td class="buildingTTtable">
                             Current Data:
                             ${await FH.Tooltips.BuildingData(meta)}
                         </td>
-                        <td class="buildingTTtable">
-                            Previous Data:
-                            ${b.oldJSON != "" ? await FH.Tooltips.BuildingData(JSON.parse(b.oldJSON)) : "" } 
-                        </td>
+                        ${b.oldJSON != "" ? `
+                            <td class="buildingTTtable">
+                                Previous Data:
+                                ${await FH.Tooltips.BuildingData(JSON.parse(b.oldJSON))} 
+                            </td>` : ""}
                     </tr>
                 </table>
             </div>`
